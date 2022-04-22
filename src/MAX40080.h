@@ -9,8 +9,8 @@
 #define MAX40080_I2C_7BIT_ADDRESS					0x21
 #endif
 
-// default resistor value is 10mOhm. If you use different resistor, edit value here or use -D 
-// compiler parameter
+// default resistor value is 10mOhm. If you use different resistor, then edit value here or use
+// -D compiler parameter
 #ifndef MAX40080_SHUNT_RESISOTR_VALUE
 #define MAX40080_SHUNT_RESISOTR_VALUE				0.010
 #endif
@@ -30,13 +30,14 @@
 #define MAX40080_REG_VOLTAGE_MEASUREMENT			0x0E
 #define MAX40080_REG_CURRENT_VOLTAGE_MEASUREMENT	0x10
 #define MAX40080_REG_INTERRUPT_ENABLE				0x14
+#define MAX40080_REG_REVISION_ID					0x15
 
-#define MAX40080_EXPAND_MACRO(content) content
+#define MAX40080_EXPAND_MACRO(content)				content
 #define MAX40080_FIELD(NAME)						NAME##_MASK, NAME##_OFFSET
 #define MAX40080_GET_FIELD_IMPL(FIELD_MASK,FIELD_OFFSET,value)	(((value) >> FIELD_OFFSET) & FIELD_MASK)
 #define MAX40080_SET_FIELD_IMPL(FIELD_MASK,FIELD_OFFSET,value)	(((value) & FIELD_MASK) << FIELD_OFFSET)
-#define MAX40080_GET_FIELD(...) MAX40080_EXPAND_MACRO(MAX40080_GET_FIELD_IMPL(__VA_ARGS__))
-#define MAX40080_SET_FIELD(...) MAX40080_EXPAND_MACRO(MAX40080_SET_FIELD_IMPL(__VA_ARGS__))
+#define MAX40080_GET_FIELD(...)						MAX40080_EXPAND_MACRO(MAX40080_GET_FIELD_IMPL(__VA_ARGS__))
+#define MAX40080_SET_FIELD(...)						MAX40080_EXPAND_MACRO(MAX40080_SET_FIELD_IMPL(__VA_ARGS__))
 
 #define MAX40080_CONFIG_MODE_MASK					0x7
 #define MAX40080_CONFIG_MODE_OFFSET					0
@@ -67,6 +68,18 @@
 #define MAX40080_STATUS_FIFO_DATA_COUNT_OFFSET		8
 #define MAX40080_STATUS_FIFO_DATA_COUNT_FIELD		MAX40080_FIELD(MAX40080_STATUS_FIFO_DATA_COUNT)
 
+#define MAX40080_FIFO_CONFIG_STORING_MODE_MASK		0x3
+#define MAX40080_FIFO_CONFIG_STORING_MODE_OFFSET	0
+#define MAX40080_FIFO_CONFIG_STORING_MODE_FIELD		MAX40080_FIELD(MAX40080_FIFO_CONFIG_STORING_MODE) 
+#define MAX40080_FIFO_CONFIG_WARNING_LEVEL_MASK		0x3F
+#define MAX40080_FIFO_CONFIG_WARNING_LEVEL_OFFSET	8
+#define MAX40080_FIFO_CONFIG_WARNING_LEVEL_FIELD	MAX40080_FIELD(MAX40080_FIFO_CONFIG_WARNING_LEVEL) 
+#define MAX40080_FIFO_CONFIG_ROLL_OVER_MASK			0x1
+#define MAX40080_FIFO_CONFIG_ROLL_OVER_OFFSET		14
+#define MAX40080_FIFO_CONFIG_ROLL_OVER_FIELD		MAX40080_FIELD(MAX40080_FIFO_CONFIG_ROLL_OVER) 
+#define MAX40080_FIFO_CONFIG_FLUSH_MASK				0x1
+#define MAX40080_FIFO_CONFIG_FLUSH_OFFSET			15
+#define MAX40080_FIFO_CONFIG_FLUSH_FIELD			MAX40080_FIELD(MAX40080_FIFO_CONFIG_FLUSH) 
 
 #define MAX40080_FIFO_CAPACITY						64
 
@@ -119,22 +132,22 @@ typedef enum {
 } MAX40080_StayHsMode;
 
 typedef enum {
-	MAX40080_AdcSampleRate_either_at_15_ksps = 0,
-	MAX40080_AdcSampleRate_either_at_18_75_ksps = 1,
-	MAX40080_AdcSampleRate_either_at_23_45_ksps = 2,
-	MAX40080_AdcSampleRate_either_at_30_ksps = 3,
-	MAX40080_AdcSampleRate_either_at_37_5_ksps = 4,
-	MAX40080_AdcSampleRate_either_at_47_1_ksps = 5,
-	MAX40080_AdcSampleRate_either_at_60_ksps = 6,
-	MAX40080_AdcSampleRate_either_at_93_5_ksps = 7,
-	MAX40080_AdcSampleRate_either_at_120_ksps = 8,
-	MAX40080_AdcSampleRate_either_at_150_ksps = 9,
-	MAX40080_AdcSampleRate_either_at_234_5_ksps = 10,
-	MAX40080_AdcSampleRate_either_at_375_ksps = 11,
-	MAX40080_AdcSampleRate_either_at_468_5_ksps = 12,
-	MAX40080_AdcSampleRate_either_at_750_ksps = 13,
-	MAX40080_AdcSampleRate_either_at_1000_ksps = 14,
-	MAX40080_AdcSampleRate_both_at_0_5_ksps= 15,
+	MAX40080_AdcSampleRate_Either_at_15_ksps = 0,
+	MAX40080_AdcSampleRate_Either_at_18_75_ksps = 1,
+	MAX40080_AdcSampleRate_Either_at_23_45_ksps = 2,
+	MAX40080_AdcSampleRate_Either_at_30_ksps = 3,
+	MAX40080_AdcSampleRate_Either_at_37_5_ksps = 4,
+	MAX40080_AdcSampleRate_Either_at_47_1_ksps = 5,
+	MAX40080_AdcSampleRate_Either_at_60_ksps = 6,
+	MAX40080_AdcSampleRate_Either_at_93_5_ksps = 7,
+	MAX40080_AdcSampleRate_Either_at_120_ksps = 8,
+	MAX40080_AdcSampleRate_Either_at_150_ksps = 9,
+	MAX40080_AdcSampleRate_Either_at_234_5_ksps = 10,
+	MAX40080_AdcSampleRate_Either_at_375_ksps = 11,
+	MAX40080_AdcSampleRate_Either_at_468_5_ksps = 12,
+	MAX40080_AdcSampleRate_Either_at_750_ksps = 13,
+	MAX40080_AdcSampleRate_Either_at_1000_ksps = 14,
+	MAX40080_AdcSampleRate_Both_at_0_5_ksps= 15,
 } MAX40080_AdcSampleRate;
 
 typedef enum {
@@ -192,10 +205,9 @@ MAX40080_Status MAX40080_GetDefaultConfiguration(MAX40080_Configuration* config)
 MAX40080_Status MAX40080_GetConfiguration(MAX40080_Configuration* config);
 MAX40080_Status MAX40080_SetConfiguration(MAX40080_Configuration* config);
 
-MAX40080_Status MAX40080_EnableInterrupts(MAX40080_Interrupt* interrupts);
+MAX40080_Status MAX40080_EnableInterrupts(MAX40080_Interrupt interrupts);
 MAX40080_Status MAX40080_GetPendingInterrupts(MAX40080_Interrupt* interrupts);
-MAX40080_Status MAX40080_ClearPendingInterrupts(MAX40080_Interrupt* interrupts);
-MAX40080_Status MAX40080_GetAvailableFifoDataCount(uint8_t* fifoDataCount);
+MAX40080_Status MAX40080_ClearPendingInterrupts(MAX40080_Interrupt interrupts);
 
 MAX40080_Status MAX40080_GetRawOverCurrentTreshold(uint8_t* treshold);
 MAX40080_Status MAX40080_SetRawOverCurrentTreshold(uint8_t treshold);
@@ -205,11 +217,12 @@ MAX40080_Status MAX40080_GetRawUnderVoltageTreshold(uint8_t* treshold);
 MAX40080_Status MAX40080_SetRawUnderVoltageTreshold(uint8_t treshold);
 MAX40080_Status MAX40080_GetRawWakeUpCurrent(uint8_t* wakeUpCurrent);
 MAX40080_Status MAX40080_SetRawWakeUpCurrent(uint8_t wakeUpCurrent);
-MAX40080_Status MAX40080_GetRawMaxPeakCurrent(uint8_t* maxPeakCurrent);
+MAX40080_Status MAX40080_GetRawMaxPeakCurrent(uint16_t* maxPeakCurrent);
 
 MAX40080_Status MAX40080_GetFifoDefaultConfiguration(MAX40080_FifoConfiguration* fifoConfig);
 MAX40080_Status MAX40080_GetFifoConfiguration(MAX40080_FifoConfiguration* fifoConfig);
 MAX40080_Status MAX40080_SetFifoConfiguration(MAX40080_FifoConfiguration* fifoConfig);
+MAX40080_Status MAX40080_GetAvailableFifoDataCount(uint8_t* fifoDataCount);
 MAX40080_Status MAX40080_FlushFifo();
 
 MAX40080_Status MAX40080_ReadRawCurrent(int16_t* current);
@@ -220,7 +233,9 @@ MAX40080_Status MAX40080_ReadCurrent(float* current);
 MAX40080_Status MAX40080_ReadVoltage(float* voltage);
 MAX40080_Status MAX40080_ReadCurrentAndVoltage(float* current, float* voltage);
 
-// Use MAX40080_SetConfiguration for access following features:
+MAX40080_Status MAX40080_GetChipRevisionId(uint8_t* revisionId);
+
+// Use MAX40080_SetConfiguration and MAX40080_GetConfiguration for access following features:
 //MAX40080_Status MAX40080_GetOperationMode(MAX40080_OperationMode* opMode);
 //MAX40080_Status MAX40080_SetOperationMode(MAX40080_OperationMode opMode);
 //MAX40080_Status MAX40080_GetI2CTimeoutSettings(MAX40080_I2CTimeoutSettings* timeoutSettings);
@@ -248,7 +263,7 @@ MAX40080_Status MAX40080_ReadCurrentAndVoltage(float* current, float* voltage);
 //MAX40080_Status MAX40080_IsFifoOverflowWarningActive(int* isFifoTresholdReached);
 //MAX40080_Status MAX40080_IsFifoOverflown(int* isFifoOverflown);
 
-// Use MAX40080_SetFifoConfiguration for access following features:
+// Use MAX40080_SetFifoConfiguration and MAX40080_GetFifoConfiguration for access following features:
 //MAX40080_Status MAX40080_GetFifoStoringMode(MAX40080_FifoStoringMode* storingMode);
 //MAX40080_Status MAX40080_SetFifoStoringMode(MAX40080_FifoStoringMode storingMode);
 //MAX40080_Status MAX40080_GetFifoOverflowWarningLevel(size_t* fifoOverflowWarningLevel);

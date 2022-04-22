@@ -4,7 +4,7 @@
 static MAX40080_Configuration MAX40080_CurrentConfig;
 static MAX40080_FifoConfiguration MAX40080_CurrentFifoConfig;
 
-static const uint8_t Crc8Table[] = {
+static const uint8_t MAX40080_Crc8Table[] = {
 	0x00, 0x07, 0x0E, 0x09, 0x1C, 0x1B, 0x12, 0x15, 0x38, 0x3F, 0x36, 0x31, 0x24, 0x23, 0x2A, 0x2D,
 	0x70, 0x77, 0x7E, 0x79, 0x6C, 0x6B, 0x62, 0x65, 0x48, 0x4F, 0x46, 0x41, 0x54, 0x53, 0x5A, 0x5D,
 	0xE0, 0xE7, 0xEE, 0xE9, 0xFC, 0xFB, 0xF2, 0xF5, 0xD8, 0xDF, 0xD6, 0xD1, 0xC4, 0xC3, 0xCA, 0xCD,
@@ -54,7 +54,7 @@ static uint8_t MAX40080_CalculateCrc(uint8_t* buffer, size_t bufferSize) {
 	uint8_t crc = 0;
 
 	while (bufferSize--) {
-		crc = Crc8Table[(*buffer++) ^ crc];
+		crc = MAX40080_Crc8Table[(*buffer++) ^ crc];
 	}
 
 	return crc;
@@ -70,113 +70,126 @@ static MAX40080_Status MAX40080_CheckCrc(uint8_t* buffer, size_t bufferSize, uin
 
 static MAX40080_Status MAX40080_ReadRegister8(uint8_t registerAddress, uint8_t* registerValue) {
 	MAX40080_Status status;
-	uint8_t buffer[3]; // registerAddress (1 Byte) + registerValue (1 Bytes) + CRC (1 Byte)
+
+	// devAddr+WR (1 Byte) + registerAddress (1 Byte) + devAddr+RD (1 Byte) + registerValue (1 Byte) + CRC (1 Byte)
+	uint8_t crcBuffer[5];
 
 	size_t readSize = sizeof(uint16_t);
 	if (MAX40080_CurrentConfig.packetErrorChecking == MAX40080_PacketErrorChecking_Enabled) {
 		readSize++;
 	}
 
-	buffer[0] = registerAddress;
+	crcBuffer[0] = MAX40080_I2C_WRITE_ADDRESS;
+	crcBuffer[1] = registerAddress;
+	crcBuffer[2] = MAX40080_I2C_READ_ADDRESS;
 
-	status = MAX40080_PlatformSpecific_Read(registerAddress, buffer + 1, readSize);
+	status = MAX40080_PlatformSpecific_Read(registerAddress, crcBuffer + 3, readSize);
 	if (status) {
 		return status;
 	}
 
 	if (MAX40080_CurrentConfig.packetErrorChecking == MAX40080_PacketErrorChecking_Enabled) {
-		// checking input: registerAddress (1 Byte) + registerValue (1 Bytes)
-		status = MAX40080_CheckCrc(buffer, 2, buffer[2]);
+		// checking input: devAddr+WR (1 Byte) + registerAddress (1 Byte) + devAddr+RD (1 Byte) + registerValue (1 Byte)
+		status = MAX40080_CheckCrc(crcBuffer, 4, crcBuffer[4]);
 		if (status) {
 			return status;
 		}
 	}
 
 	*registerValue =
-		(((uint8_t)buffer[1]) << 0);
+		(((uint8_t)crcBuffer[1]) << 0);
 
 	return MAX40080_Status_Ok;
 }
 
 static MAX40080_Status MAX40080_ReadRegister16(uint8_t registerAddress, uint16_t* registerValue) {
 	MAX40080_Status status;
-	uint8_t buffer[4]; // registerAddress (1 Byte) + registerValue (2 Bytes) + CRC (1 Byte)
+
+	// devAddr+WR (1 Byte) + registerAddress (1 Byte) + devAddr+RD (1 Byte) + registerValue (2 Bytes) + CRC (1 Byte)
+	uint8_t crcBuffer[6];
 
 	size_t readSize = sizeof(uint16_t);
 	if (MAX40080_CurrentConfig.packetErrorChecking == MAX40080_PacketErrorChecking_Enabled) {
 		readSize++;
 	}
 
-	buffer[0] = registerAddress;
+	crcBuffer[0] = MAX40080_I2C_WRITE_ADDRESS;
+	crcBuffer[1] = registerAddress;
+	crcBuffer[2] = MAX40080_I2C_READ_ADDRESS;
 
-	status = MAX40080_PlatformSpecific_Read(registerAddress, buffer + 1, readSize);
+	status = MAX40080_PlatformSpecific_Read(registerAddress, crcBuffer + 3, readSize);
 	if (status) {
 		return status;
 	}
 
 	if (MAX40080_CurrentConfig.packetErrorChecking == MAX40080_PacketErrorChecking_Enabled) {
-		// checking input: registerAddress (1 Byte) + registerValue (2 Bytes)
-		status = MAX40080_CheckCrc(buffer, 3, buffer[3]);
+		// checking input: devAddr+WR (1 Byte) + registerAddress (1 Byte) + devAddr+RD (1 Byte) + registerValue (2 Bytes)
+		status = MAX40080_CheckCrc(crcBuffer, 5, crcBuffer[5]);
 		if (status) {
 			return status;
 		}
 	}
 
 	*registerValue =
-		(((uint16_t)buffer[1]) << 0) |
-		(((uint16_t)buffer[2]) << 8);
+		(((uint16_t)crcBuffer[3]) << 0) |
+		(((uint16_t)crcBuffer[4]) << 8);
 
 	return MAX40080_Status_Ok;
 }
 
 static MAX40080_Status MAX40080_ReadRegister32(uint8_t registerAddress, uint32_t* registerValue) {
 	MAX40080_Status status;
-	uint8_t buffer[6]; // registerAddress (1 Byte) + registerValue (4 Bytes) + CRC (1 Byte)
+
+	// devAddr+WR (1 Byte) + registerAddress (1 Byte) + devAddr+RD (1 Byte) + registerValue (4 Bytes) + CRC (1 Byte)
+	uint8_t crcBuffer[8];
 
 	size_t readSize = sizeof(uint32_t);
 	if (MAX40080_CurrentConfig.packetErrorChecking == MAX40080_PacketErrorChecking_Enabled) {
 		readSize++;
 	}
 
-	buffer[0] = registerAddress;
+	crcBuffer[0] = MAX40080_I2C_WRITE_ADDRESS;
+	crcBuffer[1] = registerAddress;
+	crcBuffer[2] = MAX40080_I2C_READ_ADDRESS;
 
-	status = MAX40080_PlatformSpecific_Read(registerAddress, buffer + 1, readSize);
+	status = MAX40080_PlatformSpecific_Read(registerAddress, crcBuffer + 3, readSize);
 	if (status) {
 		return status;
 	}
 
 	if (MAX40080_CurrentConfig.packetErrorChecking == MAX40080_PacketErrorChecking_Enabled) {
-		// checking input: registerAddress (1 Byte) + registerValue (4 Bytes)
-		status = MAX40080_CheckCrc(buffer, 5, buffer[5]);
+		// checking input: devAddr+WR (1 Byte) + registerAddress (1 Byte) + devAddr+RD (1 Byte) + registerValue (4 Bytes)
+		status = MAX40080_CheckCrc(crcBuffer, 7, crcBuffer[7]);
 		if (status) {
 			return status;
 		}
 	}
 
 	*registerValue = 
-		(((uint32_t)buffer[1]) << 0) |
-		(((uint32_t)buffer[2]) << 8) | 
-		(((uint32_t)buffer[3]) << 16) | 
-		(((uint32_t)buffer[4]) << 24);
+		(((uint32_t)crcBuffer[3]) << 0) |
+		(((uint32_t)crcBuffer[4]) << 8) |
+		(((uint32_t)crcBuffer[5]) << 16) |
+		(((uint32_t)crcBuffer[6]) << 24);
 
 	return MAX40080_Status_Ok;
 }
 
 static MAX40080_Status MAX40080_WriteRegister8(uint8_t registerAddress, uint8_t registerValue) {
 	MAX40080_Status status;
-	uint8_t buffer[3]; // registerAddress (1 Byte) + registerValue (1 Bytes) + CRC (1 Byte)
+	uint8_t crcBuffer[4]; // devAddr+WR (1 Byte) + registerAddress (1 Byte) + registerValue (1 Bytes) + CRC (1 Byte)
 
-	buffer[0] = registerAddress;
-	buffer[1] = registerValue;
+	crcBuffer[0] = MAX40080_I2C_WRITE_ADDRESS;
+	crcBuffer[1] = registerAddress;
+	crcBuffer[2] = registerValue;
 
 	size_t writeSize = sizeof(uint8_t);
 
 	if (MAX40080_CurrentConfig.packetErrorChecking == MAX40080_PacketErrorChecking_Enabled) {
-		buffer[2] = MAX40080_CalculateCrc(buffer, 2);
+		crcBuffer[3] = MAX40080_CalculateCrc(crcBuffer, 3);
 		writeSize++;
 	}
 
-	status = MAX40080_PlatformSpecific_Write(registerAddress, buffer + 1, writeSize);
+	status = MAX40080_PlatformSpecific_Write(registerAddress, crcBuffer + 2, writeSize);
 	if (status) {
 		return status;
 	}
@@ -184,22 +197,23 @@ static MAX40080_Status MAX40080_WriteRegister8(uint8_t registerAddress, uint8_t 
 	return MAX40080_Status_Ok;
 }
 
-static MAX40080_Status MAX40080_WriteRegister16(uint8_t registerAddress, uint16_t registerValue) {
+MAX40080_Status MAX40080_WriteRegister16(uint8_t registerAddress, uint16_t registerValue) {
 	MAX40080_Status status;
-	uint8_t buffer[4]; // registerAddress (1 Byte) + registerValue (2 Bytes) + CRC (1 Byte)
+	uint8_t crcBuffer[5]; // devAddr+WR (1 Byte) + registerAddress (1 Byte) + registerValue (2 Bytes) + CRC (1 Byte)
 
-	buffer[0] = registerAddress;
-	buffer[1] = registerValue & 0xFF;
-	buffer[2] = (registerValue & 0xFF00) >> 8;
+	crcBuffer[0] = MAX40080_I2C_WRITE_ADDRESS;
+	crcBuffer[1] = registerAddress;
+	crcBuffer[2] = registerValue & 0xFF;
+	crcBuffer[3] = (registerValue & 0xFF00) >> 8;
 
 	size_t writeSize = sizeof(uint16_t);
 
 	if (MAX40080_CurrentConfig.packetErrorChecking == MAX40080_PacketErrorChecking_Enabled) {
-		buffer[3] = MAX40080_CalculateCrc(buffer, 3);
+		crcBuffer[4] = MAX40080_CalculateCrc(crcBuffer, 4);
 		writeSize++;
 	}
 
-	status = MAX40080_PlatformSpecific_Write(registerAddress, buffer + 1, writeSize);
+	status = MAX40080_PlatformSpecific_Write(registerAddress, crcBuffer + 2, writeSize);
 	if (status) {
 		return status;
 	}
@@ -212,9 +226,9 @@ MAX40080_Status MAX40080_GetDefaultConfiguration(MAX40080_Configuration* config)
 	config->i2cTimeoutSettings = MAX40080_I2CTimeoutSettings_Enabled;
 	config->alertResponseTime = MAX40080_AlertResponseTime_Unfiltered;
 	config->packetErrorChecking = MAX40080_PacketErrorChecking_Enabled;
-	config->inputRange = MAX40080_InputRange_50mV;
+	config->inputRange = MAX40080_InputRange_10mV;
 	config->stayHsMode = MAX40080_StayHsMode_ExitAtStop;
-	config->adcSampleRate = MAX40080_AdcSampleRate_either_at_15_ksps;
+	config->adcSampleRate = MAX40080_AdcSampleRate_Either_at_15_ksps;
 	config->digitalFilter = MAX40080_DigitalFilter_NoAverage;
 
 	return MAX40080_Status_Ok;
@@ -259,10 +273,19 @@ MAX40080_Status MAX40080_SetConfiguration(MAX40080_Configuration* config) {
 		return status;
 	}
 
+	MAX40080_CurrentConfig.operatingMode = config->operatingMode;
+	MAX40080_CurrentConfig.i2cTimeoutSettings = config->i2cTimeoutSettings;
+	MAX40080_CurrentConfig.alertResponseTime = config->alertResponseTime;
+	MAX40080_CurrentConfig.packetErrorChecking = config->packetErrorChecking;
+	MAX40080_CurrentConfig.inputRange = config->inputRange;
+	MAX40080_CurrentConfig.stayHsMode = config->stayHsMode;
+	MAX40080_CurrentConfig.adcSampleRate = config->adcSampleRate;
+	MAX40080_CurrentConfig.digitalFilter = config->digitalFilter;
+
 	return MAX40080_Status_Ok;
 }
 
-MAX40080_Status MAX40080_EnableInterrupts(MAX40080_Interrupt* interrupts) {
+MAX40080_Status MAX40080_EnableInterrupts(MAX40080_Interrupt interrupts) {
 	MAX40080_Status status;
 
 	status = MAX40080_WriteRegister16(MAX40080_REG_INTERRUPT_ENABLE, (uint16_t)interrupts);
@@ -287,7 +310,7 @@ MAX40080_Status MAX40080_GetPendingInterrupts(MAX40080_Interrupt* interrupts) {
 	return MAX40080_Status_Ok;
 }
 
-MAX40080_Status MAX40080_ClearPendingInterrupts(MAX40080_Interrupt* interrupts) {
+MAX40080_Status MAX40080_ClearPendingInterrupts(MAX40080_Interrupt interrupts) {
 	MAX40080_Status status;
 
 	status = MAX40080_WriteRegister16(MAX40080_REG_STATUS, (uint16_t)interrupts);
@@ -308,6 +331,9 @@ MAX40080_Status MAX40080_GetAvailableFifoDataCount(uint8_t* fifoDataCount) {
 	}
 
 	*fifoDataCount = MAX40080_GET_FIELD(MAX40080_STATUS_FIFO_DATA_COUNT_FIELD, statusRegVal);
+	if (*fifoDataCount == 0 && (statusRegVal & MAX40080_Interrupt_FifoOverflown)) {
+		*fifoDataCount = MAX40080_FIFO_CAPACITY;
+	}
 
 	return MAX40080_Status_Ok;
 
@@ -348,7 +374,7 @@ MAX40080_Status MAX40080_ReadRawCurrent(int16_t* current) {
 
 MAX40080_Status MAX40080_ReadRawVoltage(int16_t* voltage) {
 	MAX40080_Status status;
-	uint16_t currentRegVal;
+	uint16_t voltageRegVal;
 
 	if (MAX40080_CurrentFifoConfig.storingMode != MAX40080_FifoStoringMode_VoltageOnly) {
 		// You used wrong function to retrieve data from FIFO. Following list contains 
@@ -361,20 +387,20 @@ MAX40080_Status MAX40080_ReadRawVoltage(int16_t* voltage) {
 		return MAX40080_Status_InvalidOperation;
 	}
 
-	status = MAX40080_ReadRegister16(MAX40080_REG_VOLTAGE_MEASUREMENT, &currentRegVal);
+	status = MAX40080_ReadRegister16(MAX40080_REG_VOLTAGE_MEASUREMENT, &voltageRegVal);
 	if (status) {
 		return status;
 	}
 
-	if ((currentRegVal & 0x8000) == 0) {
+	if ((voltageRegVal & 0x8000) == 0) {
 		return MAX40080_Status_FifoIsEmpty;
 	}
 
 	// value is shifted left to replace Data Valid bit.
-	*current = (currentRegVal & 0x7FFF) << 1;
+	*voltage = (voltageRegVal & 0x7FFF) << 1;
 
 	// sign extended shift back
-	*current >>= 1;
+	*voltage >>= 1;
 
 	return MAX40080_Status_Ok;
 }
@@ -399,17 +425,17 @@ MAX40080_Status MAX40080_ReadRawCurrentAndVoltage(int16_t* current, int16_t* vol
 		return status;
 	}
 
-	if ((currentRegVal & 0x80000000) == 0) {
+	if ((currentVoltageRegVal & 0x80000000) == 0) {
 		return MAX40080_Status_FifoIsEmpty;
 	}
 
 	// value is shifted left to replace Data Valid bit. Then it is shifted right and converted to 
 	// signed int16_t
-	*current = (int16_t)((int32_t)((currentRegVal & 0x7FFF0000) << 1) >> 17);
+	*current = (int16_t)((int32_t)((currentVoltageRegVal & 0x7FFF0000) << 1) >> 17);
 
 	// value is shifted left to replace reserved bit. The it is converted to signed and shifted back 
 	// to extend the sign.
-	*voltage = ((int16_t)((uint16_t)(currentRegVal & 0x7FFF) << 1)) >> 1;
+	*voltage = ((int16_t)((uint16_t)(currentVoltageRegVal & 0x7FFF) << 1)) >> 1;
 
 	return MAX40080_Status_Ok;
 }
@@ -472,4 +498,102 @@ MAX40080_Status MAX40080_ReadCurrentAndVoltage(float* current, float* voltage) {
 	*voltage = MAX40080_ConvertVoltage(rawVoltage);
 
 	return MAX40080_Status_Ok;
+}
+
+MAX40080_Status MAX40080_GetRawOverCurrentTreshold(uint8_t* treshold) {
+	return MAX40080_ReadRegister8(MAX40080_REG_TRESHOLD_OVER_CURRENT, treshold);
+}
+
+MAX40080_Status MAX40080_SetRawOverCurrentTreshold(uint8_t treshold) {
+	return MAX40080_WriteRegister8(MAX40080_REG_TRESHOLD_OVER_CURRENT, treshold);
+}
+
+MAX40080_Status MAX40080_GetRawOverVoltageTreshold(uint8_t* treshold) {
+	return MAX40080_ReadRegister8(MAX40080_REG_TRESHOLD_OVER_VOLTAGE, treshold);
+}
+
+MAX40080_Status MAX40080_SetRawOverVoltageTreshold(uint8_t treshold) {
+	return MAX40080_WriteRegister8(MAX40080_REG_TRESHOLD_OVER_VOLTAGE, treshold);
+}
+
+MAX40080_Status MAX40080_GetRawUnderVoltageTreshold(uint8_t* treshold) {
+	return MAX40080_ReadRegister8(MAX40080_REG_TRESHOLD_UNDER_VOLTAGE, treshold);
+}
+
+MAX40080_Status MAX40080_SetRawUnderVoltageTreshold(uint8_t treshold) {
+	return MAX40080_WriteRegister8(MAX40080_REG_TRESHOLD_UNDER_VOLTAGE, treshold);
+}
+
+MAX40080_Status MAX40080_GetRawWakeUpCurrent(uint8_t* wakeUpCurrent) {
+	return MAX40080_ReadRegister8(MAX40080_REG_WAKE_UP_CURRENT, wakeUpCurrent);
+}
+
+MAX40080_Status MAX40080_SetRawWakeUpCurrent(uint8_t wakeUpCurrent) {
+	return MAX40080_WriteRegister8(MAX40080_REG_WAKE_UP_CURRENT, wakeUpCurrent);
+}
+
+MAX40080_Status MAX40080_GetRawMaxPeakCurrent(uint16_t* maxPeakCurrent) {
+	return MAX40080_ReadRegister16(MAX40080_REG_MAX_PEAK_CURRENT, maxPeakCurrent);
+}
+
+MAX40080_Status MAX40080_GetFifoDefaultConfiguration(MAX40080_FifoConfiguration* fifoConfig) {
+	fifoConfig->overflowWarningLevel = 0x34;
+	fifoConfig->rollOverMode = MAX40080_FifoRollOverMode_Ignore;
+	fifoConfig->storingMode = MAX40080_FifoStoringMode_CurrentOnly;
+
+	return MAX40080_Status_Ok;
+}
+
+MAX40080_Status MAX40080_GetFifoConfiguration(MAX40080_FifoConfiguration* fifoConfig) {
+	MAX40080_Status status;
+	uint16_t fifoConfigRegVal;
+
+	status = MAX40080_ReadRegister16(MAX40080_REG_FIFO_CONFIG, &fifoConfigRegVal);
+	if (status) {
+		return status;
+	}
+
+	fifoConfig->storingMode = MAX40080_GET_FIELD(MAX40080_FIFO_CONFIG_STORING_MODE_FIELD, fifoConfigRegVal);
+	fifoConfig->overflowWarningLevel = MAX40080_GET_FIELD(MAX40080_FIFO_CONFIG_WARNING_LEVEL_FIELD, fifoConfigRegVal);
+	fifoConfig->rollOverMode = MAX40080_GET_FIELD(MAX40080_FIFO_CONFIG_ROLL_OVER_FIELD, fifoConfigRegVal);
+
+	return MAX40080_Status_Ok;
+}
+
+MAX40080_Status MAX40080_SetFifoConfiguration(MAX40080_FifoConfiguration* fifoConfig) {
+	uint16_t fifoConfigRegVal =
+		MAX40080_SET_FIELD(MAX40080_FIFO_CONFIG_STORING_MODE_FIELD, fifoConfig->storingMode) |
+		MAX40080_SET_FIELD(MAX40080_FIFO_CONFIG_WARNING_LEVEL_FIELD, fifoConfig->overflowWarningLevel) |
+		MAX40080_SET_FIELD(MAX40080_FIFO_CONFIG_ROLL_OVER_FIELD, fifoConfig->rollOverMode);
+
+	return MAX40080_WriteRegister16(MAX40080_REG_FIFO_CONFIG, fifoConfigRegVal);
+}
+
+MAX40080_Status MAX40080_FlushFifo() {
+	MAX40080_Status status;
+	uint16_t fifoConfigRegVal;
+	uint16_t flushFifoRegVal;
+
+	status = MAX40080_ReadRegister16(MAX40080_REG_FIFO_CONFIG, &fifoConfigRegVal);
+	if (status) {
+		return status;
+	}
+
+	flushFifoRegVal = fifoConfigRegVal | MAX40080_SET_FIELD(MAX40080_FIFO_CONFIG_FLUSH_FIELD, 1);
+
+	status = MAX40080_WriteRegister16(MAX40080_REG_FIFO_CONFIG, flushFifoRegVal);
+	if (status) {
+		return status;
+	}
+
+	status = MAX40080_WriteRegister16(MAX40080_REG_FIFO_CONFIG, fifoConfigRegVal);
+	if (status) {
+		return status;
+	}
+
+	return MAX40080_Status_Ok;
+}
+
+MAX40080_Status MAX40080_GetChipRevisionId(uint8_t* revisionId) {
+	return MAX40080_ReadRegister16(MAX40080_REG_REVISION_ID, &revisionId);
 }
