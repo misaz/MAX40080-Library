@@ -1,4 +1,4 @@
-# Exmaple 01: SImple Current Measurements
+# Exmaple 01: Simple Current Measurements
 This example shows basic usage of MAX40080 CSA sensor. It uses almost standard configuration of MAX40080 sensor. Only change is that change mode from Standby to Active.
 
 Code does following tasks:
