@@ -102,7 +102,7 @@ static MAX40080_Status MAX40080_ReadRegister8(uint8_t registerAddress, uint8_t* 
 	return MAX40080_Status_Ok;
 }
 
-MAX40080_Status MAX40080_ReadRegister16(uint8_t registerAddress, uint16_t* registerValue) {
+static MAX40080_Status MAX40080_ReadRegister16(uint8_t registerAddress, uint16_t* registerValue) {
 	MAX40080_Status status;
 
 	// devAddr+WR (1 Byte) + registerAddress (1 Byte) + devAddr+RD (1 Byte) + registerValue (2 Bytes) + CRC (1 Byte)
@@ -332,7 +332,7 @@ MAX40080_Status MAX40080_GetAvailableFifoDataCount(uint8_t* fifoDataCount) {
 
 	*fifoDataCount = MAX40080_GET_FIELD(MAX40080_STATUS_FIFO_DATA_COUNT_FIELD, statusRegVal);
 	if (*fifoDataCount == 0 && (statusRegVal & MAX40080_Interrupt_FifoOverflown)) {
-		*fifoDataCount = 64;
+		*fifoDataCount = MAX40080_FIFO_CAPACITY;
 	}
 
 	return MAX40080_Status_Ok;
@@ -561,12 +561,23 @@ MAX40080_Status MAX40080_GetFifoConfiguration(MAX40080_FifoConfiguration* fifoCo
 }
 
 MAX40080_Status MAX40080_SetFifoConfiguration(MAX40080_FifoConfiguration* fifoConfig) {
+	MAX40080_Status status;
+
 	uint16_t fifoConfigRegVal =
 		MAX40080_SET_FIELD(MAX40080_FIFO_CONFIG_STORING_MODE_FIELD, fifoConfig->storingMode) |
 		MAX40080_SET_FIELD(MAX40080_FIFO_CONFIG_WARNING_LEVEL_FIELD, fifoConfig->overflowWarningLevel) |
 		MAX40080_SET_FIELD(MAX40080_FIFO_CONFIG_ROLL_OVER_FIELD, fifoConfig->rollOverMode);
 
-	return MAX40080_WriteRegister16(MAX40080_REG_FIFO_CONFIG, fifoConfigRegVal);
+	status = MAX40080_WriteRegister16(MAX40080_REG_FIFO_CONFIG, fifoConfigRegVal);
+	if (status) {
+		return status;
+	}
+
+	MAX40080_CurrentFifoConfig.storingMode = fifoConfig->storingMode;
+	MAX40080_CurrentFifoConfig.overflowWarningLevel = fifoConfig->overflowWarningLevel;
+	MAX40080_CurrentFifoConfig.rollOverMode = fifoConfig->rollOverMode;
+
+	return MAX40080_Status_Ok;
 }
 
 MAX40080_Status MAX40080_FlushFifo() {
@@ -592,4 +603,8 @@ MAX40080_Status MAX40080_FlushFifo() {
 	}
 
 	return MAX40080_Status_Ok;
+}
+
+MAX40080_Status MAX40080_GetChipRevisionId(uint8_t* revisionId) {
+	return MAX40080_ReadRegister8(MAX40080_REG_REVISION_ID, revisionId);
 }

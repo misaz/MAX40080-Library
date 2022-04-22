@@ -30,6 +30,7 @@
 #define MAX40080_REG_VOLTAGE_MEASUREMENT			0x0E
 #define MAX40080_REG_CURRENT_VOLTAGE_MEASUREMENT	0x10
 #define MAX40080_REG_INTERRUPT_ENABLE				0x14
+#define MAX40080_REG_REVISION_ID					0x15
 
 #define MAX40080_EXPAND_MACRO(content)				content
 #define MAX40080_FIELD(NAME)						NAME##_MASK, NAME##_OFFSET
@@ -231,6 +232,8 @@ MAX40080_Status MAX40080_ReadRawCurrentAndVoltage(int16_t* current, int16_t* vol
 MAX40080_Status MAX40080_ReadCurrent(float* current);
 MAX40080_Status MAX40080_ReadVoltage(float* voltage);
 MAX40080_Status MAX40080_ReadCurrentAndVoltage(float* current, float* voltage);
+
+MAX40080_Status MAX40080_GetChipRevisionId(uint8_t* revisionId);
 
 // Use MAX40080_SetConfiguration and MAX40080_GetConfiguration for access following features:
 //MAX40080_Status MAX40080_GetOperationMode(MAX40080_OperationMode* opMode);

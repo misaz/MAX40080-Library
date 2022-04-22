@@ -561,12 +561,23 @@ MAX40080_Status MAX40080_GetFifoConfiguration(MAX40080_FifoConfiguration* fifoCo
 }
 
 MAX40080_Status MAX40080_SetFifoConfiguration(MAX40080_FifoConfiguration* fifoConfig) {
+	MAX40080_Status status;
+
 	uint16_t fifoConfigRegVal =
 		MAX40080_SET_FIELD(MAX40080_FIFO_CONFIG_STORING_MODE_FIELD, fifoConfig->storingMode) |
 		MAX40080_SET_FIELD(MAX40080_FIFO_CONFIG_WARNING_LEVEL_FIELD, fifoConfig->overflowWarningLevel) |
 		MAX40080_SET_FIELD(MAX40080_FIFO_CONFIG_ROLL_OVER_FIELD, fifoConfig->rollOverMode);
 
-	return MAX40080_WriteRegister16(MAX40080_REG_FIFO_CONFIG, fifoConfigRegVal);
+	status = MAX40080_WriteRegister16(MAX40080_REG_FIFO_CONFIG, fifoConfigRegVal);
+	if (status) {
+		return status;
+	}
+
+	MAX40080_CurrentFifoConfig.storingMode = fifoConfig->storingMode;
+	MAX40080_CurrentFifoConfig.overflowWarningLevel = fifoConfig->overflowWarningLevel;
+	MAX40080_CurrentFifoConfig.rollOverMode = fifoConfig->rollOverMode;
+
+	return MAX40080_Status_Ok;
 }
 
 MAX40080_Status MAX40080_FlushFifo() {
@@ -595,5 +606,5 @@ MAX40080_Status MAX40080_FlushFifo() {
 }
 
 MAX40080_Status MAX40080_GetChipRevisionId(uint8_t* revisionId) {
-	return MAX40080_ReadRegister16(MAX40080_REG_REVISION_ID, &revisionId);
+	return MAX40080_ReadRegister8(MAX40080_REG_REVISION_ID, revisionId);
 }
