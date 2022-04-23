@@ -95,7 +95,9 @@ Every example is implemented on some platforms but not at all. Following matrix 
 
 | Example                                                            | MAX32625 | Linux |
 |--------------------------------------------------------------------|----------|-------|
-| 01_read_current_continous [description](examples/01_read_current_continous) | [Eclipse porject](examples/01_read_current_continous/max32625) | |
+| 01_read_current_continous [description](examples/01_read_current_continous) | [Eclipse project](examples/01_read_current_continous/max32625) | |
+| 02_read_voltage_continous [description](examples/02_read_voltage_continous) | [Eclipse project](examples/02_read_voltage_continous/max32625) | |
+| 03_read_current_and_voltage_continous [description](examples/03_read_current_and_voltage_continous) | [Eclipse project](examples/03_read_current_and_voltage_continous/max32625) | |
 
 ## Feedback
 Any feedback (including negative) is welcome. If you found any bug kindly create issue. You can also create issue for asking questions about library or just providing feedback.
