@@ -5,12 +5,11 @@ Originally I created this Library as part of [Element14 Experimenting with Curre
 
 ## Features
 - Written in C. Can be used in both C and C++ projects.
-- Minimal RAM usage. No dynamic memory allocation.
+- Minimal RAM usage. No dynamic memory allocations.
 - Library core depends on stdint.h (for uint8_t, uint16_t, int16_t and uint32_t types) and stddef.h (for size_t type).
 - Platform specific ports depends on vendor SDK (see section Supported platfroms and porting below).
 - Support for reading both current and voltage.
-- Support for converting measured values to amps and volts.
-- Support for reading RAW values of current and voltage from sensor. 
+- Buildin conversion of measured values to amps and volts. Reading RAW values of current and voltage from sensor is also supported. 
 - Support for all operating modes:
 	- Single-Measurement Mode
 	- Active Mode
@@ -27,7 +26,7 @@ Originally I created this Library as part of [Element14 Experimenting with Curre
 - Support for configurable FIFO level warning
 - Support for reading Max Peak Current
 - Support for interrupts.
-- Support for high-speed i2c mode.
+- Support for high-speed I2C mode.
 - Tested with [MikroElektronika MicroE Current 6 Click Board](https://www.mikroe.com/current-6-click)
 
 ## Getting started
@@ -79,6 +78,8 @@ MAX40080_Status MAX40080_ReadRawCurrentAndVoltage(int16_t* current, int16_t* vol
 MAX40080_Status MAX40080_ReadCurrent(float* current);
 MAX40080_Status MAX40080_ReadVoltage(float* voltage);
 MAX40080_Status MAX40080_ReadCurrentAndVoltage(float* current, float* voltage);
+
+MAX40080_Status MAX40080_GetChipRevisionId(uint8_t* revisionId);
 ```
 
 ## Supported platfroms and porting
