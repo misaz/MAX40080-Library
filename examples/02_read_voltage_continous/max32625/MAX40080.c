@@ -165,7 +165,7 @@ static MAX40080_Status MAX40080_ReadRegister32(uint8_t registerAddress, uint32_t
 		}
 	}
 
-	*registerValue = 
+	*registerValue =
 		(((uint32_t)crcBuffer[3]) << 0) |
 		(((uint32_t)crcBuffer[4]) << 8) |
 		(((uint32_t)crcBuffer[5]) << 16) |
@@ -431,11 +431,11 @@ MAX40080_Status MAX40080_ReadRawCurrentAndVoltage(int16_t* current, int16_t* vol
 
 	// value is shifted left to replace Data Valid bit. Then it is shifted right and converted to 
 	// signed int16_t
-	*current = (int16_t)((int32_t)((currentVoltageRegVal & 0x7FFF0000) << 1) >> 17);
+	*voltage = (int16_t)((int32_t)((currentVoltageRegVal & 0x7FFF0000) << 1) >> 17);
 
 	// value is shifted left to replace reserved bit. The it is converted to signed and shifted back 
 	// to extend the sign.
-	*voltage = ((int16_t)((uint16_t)(currentVoltageRegVal & 0x7FFF) << 1)) >> 1;
+	*current = ((int16_t)((uint16_t)(currentVoltageRegVal & 0x7FFF) << 1)) >> 1;
 
 	return MAX40080_Status_Ok;
 }
