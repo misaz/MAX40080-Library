@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>max32625_04_read_raw_current_continous</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
+			<triggers>clean,full,incremental,</triggers>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.cdt.managedbuilder.core.ScannerConfigBuilder</name>
+			<triggers>full,incremental,</triggers>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.cdt.core.cnature</nature>
+		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
+		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>CMSIS</name>
+			<type>2</type>
+			<location>C:/Maxim/Firmware/MAX32625/Libraries/CMSIS/Device/Maxim/MAX32625/Source</location>
+		</link>
+		<link>
+			<name>MAX32625PeriphDriver</name>
+			<type>2</type>
+			<location>C:/Maxim/Firmware/MAX32625/Libraries/MAX32625PeriphDriver/Source</location>
+		</link>
+	</linkedResources>
+</projectDescription>
