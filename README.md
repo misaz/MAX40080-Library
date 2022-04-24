@@ -98,7 +98,7 @@ Every example is implemented on some platforms but not at all. Following matrix 
 | Simple current measurement ([description](examples/01_read_current_continous)) | [Eclipse project](examples/01_read_current_continous/max32625) | |
 | Simple voltage measurement ([description](examples/02_read_voltage_continous)) | [Eclipse project](examples/02_read_voltage_continous/max32625) | |
 | Simple combined voltage and current measurement ([description](examples/03_read_current_and_voltage_continous)) | [Eclipse project](examples/03_read_current_and_voltage_continous/max32625) | |
-| RAW value current measurement ()[description](examples/04_read_raw_current_continous)) | [Eclipse project](examples/04_read_raw_current_continous/max32625) | |
+| RAW value current measurement ([description](examples/04_read_raw_current_continous)) | [Eclipse project](examples/04_read_raw_current_continous/max32625) | |
 
 ## Feedback
 Any feedback (including negative) is welcome. If you found any bug kindly create issue. You can also create issue for asking questions about library or just providing feedback.
