@@ -8,6 +8,52 @@ Code does following tasks:
 3. Read current samles in infinite loop
 4. Print samples over UART
 
+## Platform neutral example code
+
+```cpp
+#include "MAX40080.h"
+
+int main(void) {
+	MAX40080_Status status;
+
+	status = MAX40080_Init();
+	// handle error if status is non-zero
+
+	MAX40080_Configuration config;
+	MAX40080_GetDefaultConfiguration(&config);
+	config.adcSampleRate = MAX40080_AdcSampleRate_Both_at_0_5_ksps;
+	config.inputRange = MAX40080_InputRange_50mV;
+	config.operatingMode = MAX40080_OperationMode_Active;
+
+	status = MAX40080_SetConfiguration(&config);
+	// handle error if status is non-zero
+
+	MAX40080_FifoConfiguration fifoConfig;
+	MAX40080_GetFifoDefaultConfiguration(&fifoConfig);
+	fifoConfig.storingMode = MAX40080_FifoStoringMode_CurrentAndVoltage;
+
+	status = MAX40080_SetFifoConfiguration(&fifoConfig);
+	// handle error if status is non-zero
+
+	while (1) {
+		float current;
+		float voltage;
+
+		status = MAX40080_ReadCurrentAndVoltage(&current, &voltage);
+		if (status && status != MAX40080_Status_FifoIsEmpty) {
+			// handle error
+			continue;
+		}
+
+		if (status == MAX40080_Status_FifoIsEmpty) {
+			continue;
+		}
+		
+		// print voltage and current over UART
+	}
+}
+```
+
 ## Initializing library
 
 Initialization is the same as in [example 1](../01_read_current_continous) and [example 2](../02_read_voltage_continous).
@@ -24,7 +70,7 @@ Skipping the first step causes the `MAX40080_SetFifoConfiguration` function to f
 
 The main MAX40080 configuration looks as foolows in the example
 
-```
+```cpp
 MAX40080_Configuration config;
 MAX40080_GetDefaultConfiguration(&config);
 config.adcSampleRate = MAX40080_AdcSampleRate_Both_at_0_5_ksps;

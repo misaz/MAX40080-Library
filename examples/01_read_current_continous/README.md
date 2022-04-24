@@ -8,10 +8,47 @@ Code does following tasks:
 3. Read current samles in infinite loop
 4. Print samples over UART
 
+## Platform neutral example code
+
+```cpp
+#include "MAX40080.h"
+
+int main(void) {
+	MAX40080_Status status;
+
+	status = MAX40080_Init();
+	// handle error if status is non-zero
+
+	MAX40080_Configuration config;
+	MAX40080_GetDefaultConfiguration(&config);
+	config.operatingMode = MAX40080_OperationMode_Active;
+
+	status = MAX40080_SetConfiguration(&config);
+	// handle error if status is non-zero
+
+	while (1) {
+		float current;
+
+		status = MAX40080_ReadCurrent(&current);
+		if (status && status != MAX40080_Status_FifoIsEmpty) {
+			// handle error
+			continue;
+		}
+
+		if (status == MAX40080_Status_FifoIsEmpty) {
+			continue;
+		}
+		
+		// print current over UART
+	}
+
+}
+```
+
 ## Initializing library
 Library initialization is simple. Library can be initalized using following code snippet:
 
-```
+```cpp
 status = MAX40080_Init();
 if (status) {
 	// handle error
@@ -23,7 +60,7 @@ Sensor is configured using `MAX40080_SetConfiguration` function. This functions 
 
 Example code use default values and modifies only `operatingMode` field of structure.
 
-```
+```cpp
 MAX40080_Configuration config;
 MAX40080_GetDefaultConfiguration(&config);
 config.operatingMode = MAX40080_OperationMode_Active;
@@ -31,7 +68,7 @@ config.operatingMode = MAX40080_OperationMode_Active;
 
 Equaivalent code with manualy filling whole structure is:
 
-```
+```cpp
 MAX40080_Configuration config;
 config->operatingMode = MAX40080_OperationMode_Active;
 config->i2cTimeoutSettings = MAX40080_I2CTimeoutSettings_Enabled;
@@ -45,7 +82,7 @@ config->digitalFilter = MAX40080_DigitalFilter_NoAverage;
 
 After you have prepared configuration structure, you can pass it to the `MAX40080_SetConfiguration` function:
 
-```
+```cpp
 status = MAX40080_SetConfiguration(&config);
 if (status) {
 	// handle error
@@ -56,7 +93,7 @@ if (status) {
 
 Reading measured sample can be done using `MAX40080_ReadCurrent`. If you call the function before the collection is complete, then function returns status code `MAX40080_Status_FifoIsEmpty`. For retrieving number of samples in the FIFO you can use function `MAX40080_GetAvailableFifoDataCount` but because sensor is fast, another transaction caused by `MAX40080_GetAvailableFifoDataCount` can reduce the overal performance. Usualy is better to just try read the sample and discard them in case of detecting empty FIFO.
 
-```
+```cpp
 while (1) {
 	float current;
 

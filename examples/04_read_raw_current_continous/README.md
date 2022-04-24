@@ -8,10 +8,46 @@ Code does following tasks:
 3. Read current samles in infinite loop
 4. Print samples over UART
 
+## Platform neutral example code
+
+```cpp
+#include "MAX40080.h"
+
+int main(void) {
+	MAX40080_Status status;
+
+	status = MAX40080_Init();
+	// handle error if status is non-zero
+
+	MAX40080_Configuration config;
+	MAX40080_GetDefaultConfiguration(&config);
+	config.operatingMode = MAX40080_OperationMode_Active;
+
+	status = MAX40080_SetConfiguration(&config);
+	// handle error if status is non-zero
+
+	while (1) {
+		int16_t current;
+
+		status = MAX40080_ReadRawCurrent(&current);
+		if (status && status != MAX40080_Status_FifoIsEmpty) {
+			// handle error 
+			continue;
+		}
+
+		if (status == MAX40080_Status_FifoIsEmpty) {
+			continue;
+		}
+		
+		// print raw current over UART
+	}
+}
+```
+
+
 ## Initializing library
 
 Initialization is exactly the same as in [example 1](../01_read_current_continous).
-
 
 ## Configure sensor
 
