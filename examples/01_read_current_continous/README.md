@@ -91,3 +91,7 @@ For deploying and debugging directly from Eclipse you will need to define Launch
 For example:
 
 ![Configuration of Eclipse launch profile](readme_assets/max32625_debug_cfg.png)
+
+# Example output
+
+![Example output](readme_assets/output.png)
