@@ -93,6 +93,7 @@ typedef enum {
 	MAX40080_Status_BadArg = -21,
 	MAX40080_Status_InvalidOperation = -22,
 	MAX40080_Status_FifoIsEmpty = -23,
+	MAX40080_Status_NotSupported = -24,
 } MAX40080_Status;
 
 typedef enum {
@@ -181,6 +182,13 @@ typedef enum {
 	MAX40080_Interrupt_FifoOverflown = 128
 } MAX40080_Interrupt;
 
+typedef enum {
+	MAX40080_I2CSpeed_100_kHz = 100,
+	MAX40080_I2CSpeed_400_kHz = 400,
+	MAX40080_I2CSpeed_1_MHz = 1000,
+	MAX40080_I2CSpeed_3_4_MHz = 3400,
+} MAX40080_I2CSpeed;
+
 typedef struct {
 	MAX40080_OperationMode operatingMode;
 	MAX40080_I2CTimeoutSettings i2cTimeoutSettings;
@@ -224,6 +232,8 @@ MAX40080_Status MAX40080_GetFifoConfiguration(MAX40080_FifoConfiguration* fifoCo
 MAX40080_Status MAX40080_SetFifoConfiguration(MAX40080_FifoConfiguration* fifoConfig);
 MAX40080_Status MAX40080_GetAvailableFifoDataCount(uint8_t* fifoDataCount);
 MAX40080_Status MAX40080_FlushFifo();
+
+MAX40080_Status MAX40080_TriggerSingleShootConversion();
 
 MAX40080_Status MAX40080_ReadRawCurrent(int16_t* current);
 MAX40080_Status MAX40080_ReadRawVoltage(int16_t* voltage);

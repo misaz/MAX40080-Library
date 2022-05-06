@@ -20,5 +20,7 @@ MAX40080_Status MAX40080_PlatformSpecific_Init();
 MAX40080_Status MAX40080_PlatformSpecific_Deinit();
 MAX40080_Status MAX40080_PlatformSpecific_Read(uint8_t registerAddress, uint8_t* buffer, size_t bufferSize);
 MAX40080_Status MAX40080_PlatformSpecific_Write(uint8_t registerAddress, uint8_t* buffer, size_t bufferSize);
+MAX40080_Status MAX40080_PlatformSpecific_QuickCommand();
+MAX40080_Status MAX40080_PlatformSpecific_SetI2CSpeed(MAX40080_I2CSpeed speed);
 
 #endif

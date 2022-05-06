@@ -197,7 +197,7 @@ static MAX40080_Status MAX40080_WriteRegister8(uint8_t registerAddress, uint8_t 
 	return MAX40080_Status_Ok;
 }
 
-MAX40080_Status MAX40080_WriteRegister16(uint8_t registerAddress, uint16_t registerValue) {
+static MAX40080_Status MAX40080_WriteRegister16(uint8_t registerAddress, uint16_t registerValue) {
 	MAX40080_Status status;
 	uint8_t crcBuffer[5]; // devAddr+WR (1 Byte) + registerAddress (1 Byte) + registerValue (2 Bytes) + CRC (1 Byte)
 
@@ -337,6 +337,10 @@ MAX40080_Status MAX40080_GetAvailableFifoDataCount(uint8_t* fifoDataCount) {
 
 	return MAX40080_Status_Ok;
 
+}
+
+MAX40080_Status MAX40080_TriggerSingleShootConversion() {
+	return MAX40080_PlatformSpecific_QuickCommand();
 }
 
 MAX40080_Status MAX40080_ReadRawCurrent(int16_t* current) {

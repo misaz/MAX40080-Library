@@ -339,6 +339,10 @@ MAX40080_Status MAX40080_GetAvailableFifoDataCount(uint8_t* fifoDataCount) {
 
 }
 
+MAX40080_Status MAX40080_TriggerSingleShootConversion() {
+	return MAX40080_PlatformSpecific_QuickCommand();
+}
+
 MAX40080_Status MAX40080_ReadRawCurrent(int16_t* current) {
 	MAX40080_Status status;
 	uint16_t currentRegVal;

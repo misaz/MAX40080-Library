@@ -86,6 +86,7 @@ MAX40080_Status MAX40080_GetChipRevisionId(uint8_t* revisionId);
 Library is currently supported on following platforms:
 
 - **Maxim Integrated MAX32625**: Implementation use MAX32625 StdPeriph driver from Maxim SDK to control I2C bus. Library was tested on MAX32625PICO board.
+- **Renesas RA**: Implementation use FSP and r_iic_master driver to control I2C bus. Library was tested on EK-RA6M4 board.
 - **Linux**: Implementation use `/dev/i2c-x` devices and ioctl access enabling running library in userspace on Linux computers like Raspberry Pi SBC.
 
 Library is designed as platform independent and you can port it to whatever platform you want. If you want to port it, just implement `src/MAX40080_PlatformSpecific.c` files and remove files with suffixed names related to other platforms. In `src/MAX40080_PlatformSpecific.c` you need to implement 4 functions responsible for initialization, deinitialization and two I2C transactions. Implement them using I2C driver available on your platform. `src/MAX40080_PlatformSpecific.c` contains comments describing what you should do in each function.
