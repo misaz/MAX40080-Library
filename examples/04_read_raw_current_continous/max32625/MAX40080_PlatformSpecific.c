@@ -79,10 +79,57 @@ MAX40080_Status MAX40080_PlatformSpecific_Write(uint8_t registerAddress, uint8_t
 }
 
 MAX40080_Status MAX40080_PlatformSpecific_QuickCommand() {
-	int error;
+	int i2cm_num = MXC_I2CM_GET_IDX(MAX40080_I2C_DRIVER);
+	mxc_i2cm_fifo_regs_t* fifo = MXC_I2CM_GET_FIFO(i2cm_num);
 
-	error = I2CM_Write(MAX40080_I2C_DRIVER, MAX40080_I2C_7BIT_ADDRESS, NULL, 0, NULL, 0);
-	if (error != 0) {
+	MAX40080_I2C_DRIVER->inten = 0;
+	MAX40080_I2C_DRIVER->intfl = MAX40080_I2C_DRIVER->intfl;
+
+	// generate START sequence and transmit address+WRITE
+	int timeout = 10000;
+	while (fifo->tx && timeout--) {}
+	if (timeout == 0) {
+		return MAX40080_Status_I2CTimeout;
+	}
+	fifo->tx = MXC_S_I2CM_TRANS_TAG_START | MAX40080_I2C_WRITE_ADDRESS;
+	if (!(MAX40080_I2C_DRIVER->trans & MXC_F_I2CM_TRANS_TX_IN_PROGRESS)) {
+		MAX40080_I2C_DRIVER->trans |= MXC_F_I2CM_TRANS_TX_START;
+	}
+
+	// generate STOP sequence command
+	timeout = 10000;
+	while (fifo->tx && timeout--) {}
+	if (timeout == 0) {
+		fifo->tx = MXC_S_I2CM_TRANS_TAG_STOP;
+		return MAX40080_Status_I2CTimeout;
+	}
+	fifo->tx = MXC_S_I2CM_TRANS_TAG_STOP;
+
+	// check transaction result
+	timeout = 10000;
+	while ((MAX40080_I2C_DRIVER->trans & MXC_F_I2CM_TRANS_TX_IN_PROGRESS) && timeout--) {}
+	if (timeout == 0) {
+		return MAX40080_Status_I2CTimeout;
+	}
+
+	if (MAX40080_I2C_DRIVER->intfl & MXC_F_I2CM_INTFL_TX_TIMEOUT) {
+		MAX40080_I2C_DRIVER->intfl = MAX40080_I2C_DRIVER->intfl;
+		MAX40080_I2C_DRIVER->ctrl = MXC_F_I2CM_CTRL_MSTR_RESET_EN;
+		MAX40080_I2C_DRIVER->ctrl = MXC_F_I2CM_CTRL_TX_FIFO_EN | MXC_F_I2CM_CTRL_RX_FIFO_EN;
+		return MAX40080_Status_I2CTimeout;
+	}
+
+	if (MAX40080_I2C_DRIVER->intfl & MXC_F_I2CM_INTFL_TX_NACKED) {
+		MAX40080_I2C_DRIVER->intfl = MAX40080_I2C_DRIVER->intfl;
+		MAX40080_I2C_DRIVER->ctrl = MXC_F_I2CM_CTRL_MSTR_RESET_EN;
+		MAX40080_I2C_DRIVER->ctrl = MXC_F_I2CM_CTRL_TX_FIFO_EN | MXC_F_I2CM_CTRL_RX_FIFO_EN;
+		return MAX40080_Status_I2CNack;
+	}
+
+	if (MAX40080_I2C_DRIVER->intfl & MXC_F_I2CM_INTFL_TX_LOST_ARBITR) {
+		MAX40080_I2C_DRIVER->intfl = MAX40080_I2C_DRIVER->intfl;
+		MAX40080_I2C_DRIVER->ctrl = MXC_F_I2CM_CTRL_MSTR_RESET_EN;
+		MAX40080_I2C_DRIVER->ctrl = MXC_F_I2CM_CTRL_TX_FIFO_EN | MXC_F_I2CM_CTRL_RX_FIFO_EN;
 		return MAX40080_Status_I2CError;
 	}
 

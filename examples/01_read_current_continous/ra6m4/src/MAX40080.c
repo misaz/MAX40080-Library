@@ -131,8 +131,8 @@ static MAX40080_Status MAX40080_ReadRegister16(uint8_t registerAddress, uint16_t
 	}
 
 	*registerValue =
-	        (uint16_t)((((uint16_t)crcBuffer[3]) << 0) |
-	        (((uint16_t)crcBuffer[4]) << 8));
+		(((uint16_t)crcBuffer[3]) << 0) |
+		(((uint16_t)crcBuffer[4]) << 8);
 
 	return MAX40080_Status_Ok;
 }
@@ -203,8 +203,8 @@ static MAX40080_Status MAX40080_WriteRegister16(uint8_t registerAddress, uint16_
 
 	crcBuffer[0] = MAX40080_I2C_WRITE_ADDRESS;
 	crcBuffer[1] = registerAddress;
-	crcBuffer[2] = (uint8_t)(registerValue & 0xFF);
-	crcBuffer[3] = (uint8_t)((registerValue & 0xFF00) >> 8);
+	crcBuffer[2] = registerValue & 0xFF;
+	crcBuffer[3] = (registerValue & 0xFF00) >> 8;
 
 	size_t writeSize = sizeof(uint16_t);
 
@@ -368,7 +368,7 @@ MAX40080_Status MAX40080_ReadRawCurrent(int16_t* current) {
 	}
 
 	// value is shifted left to replace Data Valid bit.
-	*current = (int16_t)((currentRegVal & 0x7FFF) << 1);
+	*current = (currentRegVal & 0x7FFF) << 1;
 
 	// sign extended shift back
 	*current >>= 1;
@@ -401,7 +401,7 @@ MAX40080_Status MAX40080_ReadRawVoltage(int16_t* voltage) {
 	}
 
 	// value is shifted left to replace Data Valid bit.
-	*voltage = (int16_t)((voltageRegVal & 0x7FFF) << 1);
+	*voltage = (voltageRegVal & 0x7FFF) << 1;
 
 	// sign extended shift back
 	*voltage >>= 1;
@@ -447,9 +447,9 @@ MAX40080_Status MAX40080_ReadRawCurrentAndVoltage(int16_t* current, int16_t* vol
 static float MAX40080_ConvertCurrent(int16_t rawCurrent) {
 	float range;
 	if (MAX40080_CurrentConfig.inputRange == MAX40080_InputRange_50mV) {
-		range = 0.050f;
+		range = 0.050;
 	} else {
-		range = 0.010f;
+		range = 0.010;
 	}
 
 	return range * rawCurrent / (float)(1 << 12) / (float)(MAX40080_SHUNT_RESISOTR_VALUE);
@@ -457,7 +457,7 @@ static float MAX40080_ConvertCurrent(int16_t rawCurrent) {
 
 static float MAX40080_ConvertVoltage(int16_t rawVoltage) {
 	// 37.5 is 1.25 (ADC reference; Vref in datasheet) * 30 (Voltage buffer gain; G in Datasheet)
-	return rawVoltage * 37.5f / (1 << 12);
+	return rawVoltage * 37.5 / (1 << 12);
 }
 
 MAX40080_Status MAX40080_ReadCurrent(float* current) {
