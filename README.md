@@ -94,12 +94,12 @@ Library is designed as platform independent and you can port it to whatever plat
 ## Implemented examples
 Every example is implemented on some platforms but not at all. Following matrix contains information which examples are implemented on which platform. All examples contains README page with platform-independent description and code example showing how to use specific feature of library. You can use this platform-independent description in case when example is not implemented as a project for your target platform.
 
-| Example                                                            | MAX32625 |
-|--------------------------------------------------------------------|----------|
-| Example 01: Simple current measurement ([description](examples/01_read_current_continous)) | [Eclipse project](examples/01_read_current_continous/max32625) |
-| Example 02: Simple voltage measurement ([description](examples/02_read_voltage_continous)) | [Eclipse project](examples/02_read_voltage_continous/max32625) |
-| Example 03: Simple combined voltage and current measurement ([description](examples/03_read_current_and_voltage_continous)) | [Eclipse project](examples/03_read_current_and_voltage_continous/max32625) |
-| Example 04: RAW value current measurement ([description](examples/04_read_raw_current_continous)) | [Eclipse project](examples/04_read_raw_current_continous/max32625) |
+| Example                                                            | MAX32625 | RA6M4 |
+|--------------------------------------------------------------------|----------|-------|
+| Example 01: Simple current measurement ([description](examples/01_read_current_continous)) | [Eclipse project](examples/01_read_current_continous/max32625) | [e2 studio project](examples/01_read_current_continous/ra6m4) | 
+| Example 02: Simple voltage measurement ([description](examples/02_read_voltage_continous)) | [Eclipse project](examples/02_read_voltage_continous/max32625) | |
+| Example 03: Simple combined voltage and current measurement ([description](examples/03_read_current_and_voltage_continous)) | [Eclipse project](examples/03_read_current_and_voltage_continous/max32625) | |
+| Example 04: RAW value current measurement ([description](examples/04_read_raw_current_continous)) | [Eclipse project](examples/04_read_raw_current_continous/max32625) | |
 
 ## Feedback
 Any feedback (including negative) is welcome. If you found any bug kindly create issue. You can also create issue for asking questions about library or just providing feedback.
