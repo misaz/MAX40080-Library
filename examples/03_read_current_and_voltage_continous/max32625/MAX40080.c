@@ -288,7 +288,7 @@ MAX40080_Status MAX40080_SetConfiguration(MAX40080_Configuration* config) {
 MAX40080_Status MAX40080_EnableInterrupts(MAX40080_Interrupt interrupts) {
 	MAX40080_Status status;
 
-	status = MAX40080_WriteRegister16(MAX40080_REG_INTERRUPT_ENABLE, (uint16_t)interrupts);
+	status = MAX40080_WriteRegister8(MAX40080_REG_INTERRUPT_ENABLE, (uint8_t)interrupts);
 	if (status) {
 		return status;
 	}
