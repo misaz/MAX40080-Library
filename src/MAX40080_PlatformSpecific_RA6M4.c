@@ -1,5 +1,6 @@
 #include "MAX40080_PlatformSpecific.h"
 #include "hal_data.h"
+#include "r_iic_master.h"
 
 MAX40080_Status MAX40080_PlatformSpecific_Init() {
 	fsp_err_t fStatus;
