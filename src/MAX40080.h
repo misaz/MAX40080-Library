@@ -215,6 +215,7 @@ MAX40080_Status MAX40080_SetConfiguration(MAX40080_Configuration* config);
 
 MAX40080_Status MAX40080_EnableInterrupts(MAX40080_Interrupt interrupts);
 MAX40080_Status MAX40080_GetPendingInterrupts(MAX40080_Interrupt* interrupts);
+MAX40080_Status MAX40080_GetPendingInterruptsAndAvailableFifoDataCount(MAX40080_Interrupt* interrupts, uint8_t* fifoDataCount);
 MAX40080_Status MAX40080_ClearPendingInterrupts(MAX40080_Interrupt interrupts);
 
 MAX40080_Status MAX40080_GetRawOverCurrentTreshold(uint8_t* treshold);

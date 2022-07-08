@@ -1,6 +1,9 @@
 #include "MAX40080.h"
 #include "MAX40080_PlatformSpecific.h"
 
+#include <stdint.h>
+#include <stddef.h>
+
 static MAX40080_Configuration MAX40080_CurrentConfig;
 static MAX40080_FifoConfiguration MAX40080_CurrentFifoConfig;
 
@@ -306,6 +309,24 @@ MAX40080_Status MAX40080_GetPendingInterrupts(MAX40080_Interrupt* interrupts) {
 	}
 
 	*interrupts = statusRegVal & 0xFF;
+
+	return MAX40080_Status_Ok;
+}
+
+MAX40080_Status MAX40080_GetPendingInterruptsAndAvailableFifoDataCount(MAX40080_Interrupt* interrupts, uint8_t* fifoDataCount) {
+	MAX40080_Status status;
+	uint16_t statusRegVal;
+
+	status = MAX40080_ReadRegister16(MAX40080_REG_STATUS, &statusRegVal);
+	if (status) {
+		return status;
+	}
+
+	*interrupts = statusRegVal & 0xFF;
+	*fifoDataCount = MAX40080_GET_FIELD(MAX40080_STATUS_FIFO_DATA_COUNT_FIELD, statusRegVal);
+	if (*fifoDataCount == 0 && (statusRegVal & MAX40080_Interrupt_FifoOverflown)) {
+		*fifoDataCount = MAX40080_FIFO_CAPACITY;
+	}
 
 	return MAX40080_Status_Ok;
 }
