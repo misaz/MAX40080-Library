@@ -53,6 +53,7 @@ MAX40080_Status MAX40080_SetConfiguration(MAX40080_Configuration* config);
 
 MAX40080_Status MAX40080_EnableInterrupts(MAX40080_Interrupt interrupts);
 MAX40080_Status MAX40080_GetPendingInterrupts(MAX40080_Interrupt* interrupts);
+MAX40080_Status MAX40080_GetPendingInterruptsAndAvailableFifoDataCount(MAX40080_Interrupt* interrupts, uint8_t* fifoDataCount);
 MAX40080_Status MAX40080_ClearPendingInterrupts(MAX40080_Interrupt interrupts);
 
 MAX40080_Status MAX40080_GetRawOverCurrentTreshold(uint8_t* treshold);
@@ -70,6 +71,8 @@ MAX40080_Status MAX40080_GetFifoConfiguration(MAX40080_FifoConfiguration* fifoCo
 MAX40080_Status MAX40080_SetFifoConfiguration(MAX40080_FifoConfiguration* fifoConfig);
 MAX40080_Status MAX40080_GetAvailableFifoDataCount(uint8_t* fifoDataCount);
 MAX40080_Status MAX40080_FlushFifo();
+
+MAX40080_Status MAX40080_TriggerSingleShootConversion();
 
 MAX40080_Status MAX40080_ReadRawCurrent(int16_t* current);
 MAX40080_Status MAX40080_ReadRawVoltage(int16_t* voltage);
